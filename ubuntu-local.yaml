@@ -63,7 +63,7 @@
 
     - name: Install Oh My Posh
       shell: |
-        curl -s "{{ oh_my_posh_installer_url }}" | bash -s -- -d "{{ ansible_env.HOME }}/.local/bin"
+        curl -s "{{ oh_my_posh_installer_url }}" | bash -s -- -d "{{ user_home }}/.local/bin"
       args:
         creates: "{{ user_home }}/.local/bin/oh-my-posh"
 
