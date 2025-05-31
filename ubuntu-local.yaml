@@ -1,0 +1,79 @@
+- name: Setup local Ubuntu machine
+  hosts: localhost
+  connection: local
+  become: yes
+
+  vars:
+    user_home: "{{ lookup('env','HOME') }}"
+    rustup_installer_url: "https://sh.rustup.rs"
+    oh_my_posh_installer_url: "https://ohmyposh.dev/install.sh"
+    google:
+      key_url: "https://dl.google.com/linux/linux_signing_key.pub"
+      chrome_repo_uri: "http://dl.google.com/linux/chrome/deb/"
+
+  tasks:
+    - name: Update APT cache
+      apt:
+        update_cache: yes
+
+    - name: Install APT packages
+      apt:
+        name:
+          - gnome-tweaks
+          - passwordsafe
+          - curl
+          - firefox
+        state: present
+
+    - name: Add Google Chrome repository
+      deb822_repository:
+        name: "google-chrome"
+        types: deb
+        uris: "{{ google.chrome_repo_uri }}"
+        suites: stable
+        components:
+          - main
+        signed_by: "{{ google.key_url }}"
+        state: present
+
+    - name: Install Google Chrome (Stable)
+      apt:
+        name: google-chrome-stable
+        state: present
+
+    - name: Install Rust via rustup
+      shell: |
+        curl --proto '=https' --tlsv1.2 -sSf "{{ rustup_installer_url }}" | sh -s -- -y
+      args:
+        creates: "{{ user_home }}/.cargo/bin/rustup"
+      environment:
+        HOME: "{{ user_home }}"
+
+    - name: Ensure `~/.local/bin` directory exists
+      file:
+        path: "{{ user_home }}/.local/bin"
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Install Oh My Posh
+      shell: |
+        curl -s "{{ oh_my_posh_installer_url }}" | bash -s -- -d "{{ ansible_env.HOME }}/.local/bin"
+      args:
+        creates: "{{ user_home }}/.local/bin/oh-my-posh"
+
+    - name: Install RustRover
+      command: snap install rustrover --classic
+      args:
+        creates: /snap/bin/rustrover
+
+    - name: Install Docker
+      command: snap install docker
+      args:
+        creates: /snap/bin/docker
+
+    - name: Install Spotify
+      command: snap install spotify
+      args:
+        creates: /snap/bin/spotify
