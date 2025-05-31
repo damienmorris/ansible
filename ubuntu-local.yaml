@@ -36,6 +36,10 @@
         signed_by: "{{ google.key_url }}"
         state: present
 
+    - name: Update APT cache with new Google Chrome repo
+      apt:
+        update_cache: yes
+
     - name: Install Google Chrome (Stable)
       apt:
         name: google-chrome-stable
