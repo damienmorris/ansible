@@ -13,6 +13,8 @@ sudo pipx ensurepath --global # optional to allow pipx actions with --global arg
 pipx install --include-deps ansible
 ```
 
+3. Restart shell before using ansible
+
 # Playbook: `ubuntu-local`
 
 1. Install dependencies:
@@ -20,7 +22,9 @@ pipx install --include-deps ansible
 pipx inject ansible python-debian
 ```
 
-2. Run playbook
+2. Restart shell
+
+3. Run playbook
 ```
 ansible-playbook -u <username> --ask-become-pass ubuntu-local.yaml
 ```
